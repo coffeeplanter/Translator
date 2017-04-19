@@ -1,0 +1,22 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <!--Theme.AppCompat.NoActionBar-->
+    <style name="AppTranslatorTheme" parent="Theme.AppCompat">
+        <item name="colorPrimary">@android:color/transparent</item>
+        <item name="windowActionBarOverlay">true</item>
+        <item name="windowActionModeOverlay">true</item>
+        <item name="android:spinnerItemStyle">@style/transSpinnerItemStyle</item>
+        <item name="android:textAppearanceLarge">@style/textSizeStyle</item>
+    </style>
+
+    <style name="transSpinnerItemStyle" parent="Widget.AppCompat.TextView.SpinnerItem">
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:gravity">center</item>
+    </style>
+
+    <style name="textSizeStyle" parent="TextAppearance.AppCompat.Large">
+        <!--<item name="android:textSize">64sp</item>-->
+    </style>
+
+</resources>

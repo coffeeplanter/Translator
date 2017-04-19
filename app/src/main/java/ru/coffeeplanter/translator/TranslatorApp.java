@@ -1,0 +1,44 @@
+package ru.coffeeplanter.translator;
+
+import android.app.Application;
+import android.util.Log;
+
+import java.util.concurrent.TimeUnit;
+
+import okhttp3.OkHttpClient;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
+
+/**
+ * Класс приложения, где инициализируется объект Ретрофита и объект интерфейса.
+ */
+
+public class TranslatorApp extends Application {
+
+    private final String BASE_URL = "https://translate.yandex.net/";
+
+    private static TranslationApi sLocationApi;
+    private Retrofit mRetrofit;
+
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        OkHttpClient okHttpClient = new OkHttpClient.Builder()
+                .connectTimeout(10, TimeUnit.SECONDS)
+                .readTimeout(30, TimeUnit.SECONDS)
+                .build();
+        mRetrofit = new Retrofit.Builder()
+                .baseUrl(BASE_URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .client(okHttpClient)
+                .build();
+        sLocationApi = mRetrofit.create(TranslationApi.class);
+        Log.d("App", "" + sLocationApi);
+    }
+
+    public static TranslationApi getApi() {
+        return sLocationApi;
+    }
+
+}
