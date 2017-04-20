@@ -36,6 +36,7 @@ import java.util.TreeMap;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import ru.coffeeplanter.translator.utils.LocaleUtils;
 
 /**
  * Класс фрагмента основного экрана переводчика.
@@ -44,6 +45,8 @@ import retrofit2.Response;
 public class TranslatorFragment extends Fragment {
 
     private final String TAG = "TranslatorFragment";
+
+    Map<String, String> mLanguagesMap;
 
     EditText mEditTextTextToTranslate;
     TextView mTextViewTranslatedText;
@@ -55,6 +58,9 @@ public class TranslatorFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.fragment_translator, container, false);
+
+        mLanguagesMap = new TreeMap<>();
+        mLanguagesMap = TranslatorLab.get(getActivity()).getLanguages();
 
         mEditTextTextToTranslate = (EditText) view.findViewById(R.id.text_to_translate_edit_text);
         mEditTextTextToTranslate.addTextChangedListener(new TextWatcher() {
@@ -70,6 +76,7 @@ public class TranslatorFragment extends Fragment {
 
             @Override
             public void afterTextChanged(Editable s) {
+                requestForTranslation(s);
                 mTextViewTranslatedText.setText(mEditTextTextToTranslate.getText());
                 Linkify.addLinks(mTextViewTranslatedText, Linkify.ALL);
                 mTextViewTranslatedText.setMovementMethod(LinkMovementMethod.getInstance());
@@ -128,17 +135,20 @@ public class TranslatorFragment extends Fragment {
         actionBar.setDisplayHomeAsUpEnabled(false);
         actionBar.setTitle("");
 
+        Log.d(TAG, LocaleUtils.getCurrentLanguage(getActivity()));
 
-        TranslatorApp.getApi().getData("ru", "trnsl.1.1.20170418T233356Z.12f8610ff8a3faff.3de659c2f61b1b3f82f4a871459f1a2a0d861f8c").enqueue(new Callback<JsonObject>() {
+        TranslatorApp.getApi().getLanguages(LocaleUtils.getCurrentLanguage(getActivity()),
+                "trnsl.1.1.20170418T233356Z.12f8610ff8a3faff.3de659c2f61b1b3f82f4a871459f1a2a0d861f8c").enqueue(new Callback<JsonObject>() {
             @Override
             public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
                 JsonObject responseJSONObject = response.body().getAsJsonObject("langs");
-                Map<String, String> langsMap = new TreeMap<>();
-                for (Map.Entry<String,JsonElement> entry : responseJSONObject.entrySet()) {
-                    langsMap.put(entry.getValue().getAsString(), entry.getKey());
+                mLanguagesMap.clear();
+                for (Map.Entry<String, JsonElement> entry : responseJSONObject.entrySet()) {
+                    mLanguagesMap.put(entry.getValue().getAsString(), entry.getKey());
                 }
-                Log.d(TAG, langsMap.toString());
-                List<String> langsList = new ArrayList<>(langsMap.keySet());
+                TranslatorLab.get(getActivity()).updateLanguagesList(mLanguagesMap);
+                Log.d(TAG, mLanguagesMap.toString());
+                List<String> langsList = new ArrayList<>(mLanguagesMap.keySet());
                 ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_item, langsList);
                 adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 mSpinnerFromLanguage.setAdapter(adapter);
@@ -155,6 +165,26 @@ public class TranslatorFragment extends Fragment {
 
 
         return view;
+    }
+
+    private void requestForTranslation(Editable s) {
+
+        TranslatorApp.getApi().getTranslation(s.toString(), "ru-en", "trnsl.1.1.20170418T233356Z.12f8610ff8a3faff.3de659c2f61b1b3f82f4a871459f1a2a0d861f8c").enqueue(new Callback<JsonObject>() {
+            @Override
+            public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                if (response.body() != null) {
+                    String buffer = response.body().getAsJsonArray("text").get(0).toString();
+                    mTextViewTranslatedText.setText(buffer.substring(1, buffer.length() - 1));
+                    Log.d(TAG, response.body().getAsJsonArray("text").toString());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<JsonObject> call, Throwable t) {
+                Log.e(TAG, "Error while getting translation from server", t);
+            }
+        });
+
     }
 
 

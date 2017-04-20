@@ -1,21 +1,40 @@
 package ru.coffeeplanter.translator;
 
+import java.util.Date;
+import java.util.UUID;
+
 /**
- * Модель карточки перевода для списков истории и закладок
+ * Модель карточки перевода.
  */
 
 public class TranslationCard {
 
+    private final String LANGUAGES_DIVIDER = "→";
+
+    private UUID mId;
     private String mTextToTranslate;
     private String mTranslatedText;
-    private String mTranslationDirection;
+    private String mFromLanguage;
+    private String mToLanguage;
     private boolean mBookmarked;
+    private Date mRequestDate;
 
     public TranslationCard(String textToTranslate, String translatedText, boolean bookmarked) {
+        mId = UUID.randomUUID();
         mTextToTranslate = textToTranslate;
         mTranslatedText = translatedText;
-        mTranslationDirection = "En→Ru";
+        mFromLanguage = "ru";
+        mToLanguage = "en";
         mBookmarked = bookmarked;
+        mRequestDate = new Date();
+    }
+
+    public UUID getId() {
+        return mId;
+    }
+
+    public void setId(UUID id) {
+        mId = id;
     }
 
     public String getTextToTranslate() {
@@ -34,12 +53,29 @@ public class TranslationCard {
         mTranslatedText = translatedText;
     }
 
-    public String getTranslationDirection() {
-        return mTranslationDirection;
+    public String getFromLanguage() {
+        return mFromLanguage;
     }
 
-    public void setTranslationDirection(String translationDirection) {
-        mTranslationDirection = translationDirection;
+    public void setFromLanguage(String fromLanguage) {
+        mFromLanguage = fromLanguage;
+    }
+
+    public String getToLanguage() {
+        return mToLanguage;
+    }
+
+    public void setToLanguage(String toLanguage) {
+        mToLanguage = toLanguage;
+    }
+
+    public String getTranslationDirection() {
+        return
+                getFromLanguage().substring(0, 1).toUpperCase() +
+                getFromLanguage().substring(1) +
+                LANGUAGES_DIVIDER +
+                getToLanguage().substring(0, 1).toUpperCase() +
+                getToLanguage().substring(1);
     }
 
     public boolean isBookmarked() {
@@ -48,6 +84,14 @@ public class TranslationCard {
 
     public void setBookmarked(boolean bookmarked) {
         mBookmarked = bookmarked;
+    }
+
+    public Date getRequestDate() {
+        return mRequestDate;
+    }
+
+    public void setRequestDate(Date requestDate) {
+        mRequestDate = requestDate;
     }
 
 }

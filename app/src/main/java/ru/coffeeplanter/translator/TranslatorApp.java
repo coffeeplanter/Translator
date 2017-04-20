@@ -10,7 +10,9 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 /**
- * Класс приложения, где инициализируется объект Ретрофита и объект интерфейса.
+ * Класс приложения, где инициализируются и хранятся
+ * объект интерфейса для HTTP-запроса через Retrofit и
+ * объект Retrofit.
  */
 
 public class TranslatorApp extends Application {
