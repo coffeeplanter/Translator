@@ -4,7 +4,7 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import ru.coffeeplanter.translator.database.TranslatorDbSchema.LanguagesTable;
+import ru.coffeeplanter.translator.database.TranslatorDbSchema.*;
 
 /**
  * Класс для инициализации базы данных.
@@ -34,20 +34,47 @@ public class TranslatorBaseHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
 
-        // Создание базы данных поддерживаемых языков
-        db.execSQL("CREATE TABLE IF NOT EXIST " + LanguagesTable.NAME + "(" +
-                "_id integer PRIMARY KEY AUTOINCREMENT, " +
-                LanguagesTable.Cols.LANGUAGE_CODE + " text NOT NULL UNIQUE, " +
-                LanguagesTable.Cols.DISPLAY_LANGUAGE_FOR_CURRENT_LOCALE + " text NOT NULL UNIQUE" +
-                ")"
+        // Создание базы данных поддерживаемых языков.
+        db.execSQL("CREATE TABLE " + LanguagesTable.NAME + "(" +
+                "_id integer UNIQUE, " +
+                LanguagesTable.Cols.LANGUAGE_CODE + " text PRIMARY KEY, " +
+                LanguagesTable.Cols.DISPLAY_LANGUAGE_FOR_CURRENT_LOCALE + " text" +
+                ");"
         );
 
-        // Её наполнение начальными данными (которые потом будут перезаписаны данными с сервера)
+//        db.execSQL("CREATE TABLE IF NOT EXIST " + LanguagesTable.NAME + "(" +
+//                "_id integer PRIMARY KEY AUTOINCREMENT, " +
+//                LanguagesTable.Cols.LANGUAGE_CODE + " text NOT NULL UNIQUE, " +
+//                LanguagesTable.Cols.DISPLAY_LANGUAGE_FOR_CURRENT_LOCALE + " text NOT NULL UNIQUE" +
+//                ")"
+//        );
+
+        // Её наполнение начальными данными (которые потом будут перезаписаны данными с сервера).
+        int i = 0;
         for (String[] langs : initial_languages) {
             db.execSQL("INSERT INTO " + LanguagesTable.NAME + " VALUES (" +
-                    "null, " + langs[0] + ", " + langs[1] + ")"
+                    + ++i + ", " + langs[0] + ", " + langs[1] + ")"
             );
         }
+
+        // Создаём базу данных карточек перевода.
+        db.execSQL("CREATE TABLE " + TranslationCardsTable.NAME + "(" +
+                "_id integer PRIMARY KEY AUTOINCREMENT, " +
+                TranslationCardsTable.Cols.UUID + " text, " +
+                TranslationCardsTable.Cols.TEXT_TO_TRANSLATE + " text, " +
+                TranslationCardsTable.Cols.TRANSLATED_TEXT + " text, " +
+                TranslationCardsTable.Cols.FROM_LANGUAGE + " text, " +
+                TranslationCardsTable.Cols.TO_LANGUAGE + " text, " +
+                TranslationCardsTable.Cols.BOOKMARKED + " integer, " +
+                TranslationCardsTable.Cols.REQUEST_DATE + " integer, " +
+                "FOREIGN KEY (" + TranslationCardsTable.Cols.FROM_LANGUAGE + ") " +
+                "REFERENCES " + LanguagesTable.NAME + " (" + LanguagesTable.Cols.LANGUAGE_CODE +"), " +
+                "FOREIGN KEY (" + TranslationCardsTable.Cols.TO_LANGUAGE + ") " +
+                "REFERENCES " + LanguagesTable.NAME + " (" + LanguagesTable.Cols.LANGUAGE_CODE +")" +
+                ");" +
+                "CREATE UNIQUE INDEX idx_translation_cards_text_to_translate ON " +
+                TranslationCardsTable.NAME + " (" + TranslationCardsTable.Cols.TEXT_TO_TRANSLATE + ");"
+        );
 
     }
 

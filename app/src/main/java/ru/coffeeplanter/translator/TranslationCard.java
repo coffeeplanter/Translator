@@ -19,13 +19,23 @@ public class TranslationCard {
     private boolean mBookmarked;
     private Date mRequestDate;
 
-    public TranslationCard(String textToTranslate, String translatedText, boolean bookmarked) {
-        mId = UUID.randomUUID();
-        mTextToTranslate = textToTranslate;
-        mTranslatedText = translatedText;
-        mFromLanguage = "ru";
-        mToLanguage = "en";
-        mBookmarked = bookmarked;
+//    public TranslationCard(String textToTranslate, String translatedText, boolean bookmarked) {
+//        mId = UUID.randomUUID();
+//        mTextToTranslate = textToTranslate;
+//        mTranslatedText = translatedText;
+//        mFromLanguage = "ru";
+//        mToLanguage = "en";
+//        mBookmarked = bookmarked;
+//        mRequestDate = new Date();
+//    }
+
+    public TranslationCard() {
+        this(UUID.randomUUID());
+    }
+
+    public TranslationCard(UUID id) {
+        mId = id;
+        mBookmarked = false;
         mRequestDate = new Date();
     }
 
@@ -70,12 +80,15 @@ public class TranslationCard {
     }
 
     public String getTranslationDirection() {
-        return
-                getFromLanguage().substring(0, 1).toUpperCase() +
-                getFromLanguage().substring(1) +
-                LANGUAGES_DIVIDER +
-                getToLanguage().substring(0, 1).toUpperCase() +
-                getToLanguage().substring(1);
+        String fromBufffer = getFromLanguage();
+        if (fromBufffer != null) {
+            fromBufffer = getFromLanguage().substring(0, 1).toUpperCase() + getFromLanguage().substring(1);
+        }
+        String toBufffer = getToLanguage();
+        if (toBufffer != null) {
+            toBufffer = getToLanguage().substring(0, 1).toUpperCase() + getToLanguage().substring(1);
+        }
+        return fromBufffer + LANGUAGES_DIVIDER + toBufffer;
     }
 
     public boolean isBookmarked() {

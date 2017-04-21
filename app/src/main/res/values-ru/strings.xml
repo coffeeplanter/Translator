@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Переводчик</string>
+    <string name="enter_text_hint">Введите слово или текст…</string>
+    <string name="app_background_description">Фоновое изображение</string>
 </resources>

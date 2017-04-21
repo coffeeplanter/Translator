@@ -1,6 +1,5 @@
 package ru.coffeeplanter.translator;
 
-import android.content.Context;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -17,7 +16,6 @@ import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationSet;
 import android.view.animation.AnimationUtils;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
@@ -46,26 +44,9 @@ public class TranslationsListFragment extends Fragment {
 
         if (mTranslationCards == null) {
             mTranslationCards = new ArrayList<>();
-            mTranslationCards.add(new TranslationCard("1 Table", "Стол", false));
-            mTranslationCards.add(new TranslationCard("2 House", "Дом", true));
-            mTranslationCards.add(new TranslationCard("3 Table", "Стол", false));
-            mTranslationCards.add(new TranslationCard("4 House", "Дом", true));
-            mTranslationCards.add(new TranslationCard("5 Table", "Стол", false));
-            mTranslationCards.add(new TranslationCard("6 House", "Дом", true));
-            mTranslationCards.add(new TranslationCard("7 Table", "Стол", false));
-            mTranslationCards.add(new TranslationCard("8 House", "Дом", true));
-            mTranslationCards.add(new TranslationCard("9 Table", "Стол", false));
-            mTranslationCards.add(new TranslationCard("10 House", "Дом", true));
-            mTranslationCards.add(new TranslationCard("11 Table", "Стол", false));
-            mTranslationCards.add(new TranslationCard("12 House fvfdhjbsdjv df dsfv dsfds d seg se ser  er esg  ers erg ", "Дом  dsfsdg e er esrg seg sdg se df st hstg sdstr", true));
-            mTranslationCards.add(new TranslationCard("13 Table", "Стол", false));
-            mTranslationCards.add(new TranslationCard("14 House", "Дом", true));
-            mTranslationCards.add(new TranslationCard("15 Table", "Стол", false));
-            mTranslationCards.add(new TranslationCard("16 House", "Дом", true));
-            mTranslationCards.add(new TranslationCard("17 Flat", "Квартира", false));
-//            mTranslationCards.add(new TranslationCard("Sed ut perspiciatis, unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam eaque ipsa, quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt, explicabo. Nemo enim ipsam voluptatem, quia voluptas sit, aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos, qui ratione voluptatem sequi nesciunt, neque porro quisquam est, qui dolorem ipsum, quia dolor sit, amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt, ut labore et dolore magnam aliquam quaerat voluptatem.", "Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur? Quis autem vel eum iure reprehenderit, qui in ea voluptate velit esse, quam nihil molestiae consequatur, vel illum, qui dolorem eum fugiat, quo voluptas nulla pariatur? At vero eos et accusamus et iusto odio dignissimos ducimus, qui blanditiis praesentium voluptatum deleniti atque corrupti, quos dolores et quas molestias excepturi sint, obcaecati cupiditate non provident, similique sunt in culpa, qui officia deserunt mollitia animi, id est laborum et dolorum fuga.", false));
-
         }
+
+        mTranslationCards = TranslatorLab.get(getActivity()).getTranslationCards();
 
         if (mTranslationCardAdapter == null) {
             mTranslationCardAdapter = new TranslationCardAdapter(mTranslationCards);
@@ -156,7 +137,7 @@ public class TranslationsListFragment extends Fragment {
             if (mTranslationCard.isBookmarked()) {
                 mBookmarkedImageButton.setImageResource(R.drawable.ic_bookmark_teal_24dp);
             } else {
-                mBookmarkedImageButton.setImageResource(R.drawable.ic_bookmark_white_24dp);
+                mBookmarkedImageButton.setImageResource(R.drawable.ic_bookmark_24dp);
             }
         }
 
