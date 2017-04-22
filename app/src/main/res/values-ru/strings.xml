@@ -1,6 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Переводчик</string>
+    <string name="history_header">История переводов</string>
+    <string name="bookmarks_header">Избранные переводы</string>
+    <string name="clear_all_history_menu_item">Удалить историю</string>
+    <string name="clear_all_bookmarks_menu_item">Очистить список</string>
     <string name="enter_text_hint">Введите слово или текст…</string>
     <string name="app_background_description">Фоновое изображение</string>
+    <string name="bookmarks_limit_achieved_message">Достигнут лимит закладок!</string>
+    <string name="bookmarks_are_being_deleted_separately_message">Избранные переводы удаляются свайпом или все вместе из соответствующего раздела</string>
+    <string name="empty_list_label">Список пуст</string>
+    <string name="translation_error_label">Не удалось соединиться с сервером…</string>
 </resources>

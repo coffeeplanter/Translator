@@ -1,7 +1,6 @@
 package ru.coffeeplanter.translator;
 
 import android.app.Application;
-import android.util.Log;
 
 import java.util.concurrent.TimeUnit;
 
@@ -16,6 +15,8 @@ import retrofit2.converter.gson.GsonConverterFactory;
  */
 
 public class TranslatorApp extends Application {
+
+    private final String TAG = "TranslatorApp";
 
     private final String BASE_URL = "https://translate.yandex.net/";
 
@@ -36,7 +37,6 @@ public class TranslatorApp extends Application {
                 .client(okHttpClient)
                 .build();
         sLocationApi = mRetrofit.create(TranslationApi.class);
-        Log.d("App", "" + sLocationApi);
     }
 
     public static TranslationApi getApi() {

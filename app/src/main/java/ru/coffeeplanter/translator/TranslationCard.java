@@ -9,6 +9,8 @@ import java.util.UUID;
 
 public class TranslationCard {
 
+    private final String TAG = "TranslationsCard";
+
     private final String LANGUAGES_DIVIDER = "→";
 
     private UUID mId;
@@ -18,16 +20,6 @@ public class TranslationCard {
     private String mToLanguage;
     private boolean mBookmarked;
     private Date mRequestDate;
-
-//    public TranslationCard(String textToTranslate, String translatedText, boolean bookmarked) {
-//        mId = UUID.randomUUID();
-//        mTextToTranslate = textToTranslate;
-//        mTranslatedText = translatedText;
-//        mFromLanguage = "ru";
-//        mToLanguage = "en";
-//        mBookmarked = bookmarked;
-//        mRequestDate = new Date();
-//    }
 
     public TranslationCard() {
         this(UUID.randomUUID());

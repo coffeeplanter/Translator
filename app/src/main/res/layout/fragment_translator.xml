@@ -39,30 +39,66 @@
         android:id="@+id/text_to_translate_edit_text"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_margin="8dp"
         android:background="@android:color/transparent"
         android:backgroundTint="@android:color/transparent"
         android:gravity="top|center_horizontal"
         android:hint="@string/enter_text_hint"
         android:inputType="textMultiLine"
         android:lines="6"
-        android:maxLines="10"
+        android:maxLines="6"
         android:minLines="2"
-        android:paddingBottom="32dp"
+        android:paddingBottom="12dp"
         android:scrollbars="vertical"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:textColor="@android:color/white"
         android:textColorHint="@color/hintColor"
         app:layout_constraintBottom_toTopOf="@+id/translated_text_text_view"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintRight_toLeftOf="@+id/clear_text_to_translate_image_button"
         app:layout_constraintTop_toTopOf="parent"/>
+
+    <ImageButton
+        android:id="@+id/clear_text_to_translate_image_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginTop="0dp"
+        android:background="@android:color/transparent"
+        android:src="@drawable/ic_cancel_24dp"
+        android:visibility="gone"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/text_to_translate_edit_text"
+        app:layout_goneMarginBottom="8dp"
+        app:layout_goneMarginEnd="8dp"
+        app:layout_goneMarginLeft="32dp"
+        app:layout_goneMarginRight="32dp"
+        app:layout_goneMarginTop="0dp"/>
+
+    <ImageButton
+        android:id="@+id/add_to_bookmarks_image_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginTop="24dp"
+        android:background="@android:color/transparent"
+        android:src="@drawable/ic_bookmark_24dp"
+        android:visibility="gone"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/clear_text_to_translate_image_button"/>
 
     <TextView
         android:id="@+id/translated_text_text_view"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_margin="8dp"
         android:gravity="center|bottom"
-        android:maxLines="10"
+        android:maxLines="6"
         android:paddingBottom="32dp"
         android:scrollbars="vertical"
         android:textAppearance="?android:attr/textAppearanceLarge"
@@ -70,11 +106,10 @@
         android:textIsSelectable="true"
         app:layout_constraintBottom_toTopOf="@+id/from_language_spinner"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintRight_toLeftOf="@+id/history_image_button"
         app:layout_constraintTop_toBottomOf="@+id/text_to_translate_edit_text"
-        tools:text="Переведено сервисом «Яндекс.Переводчик» http://translate.yandex.ru/"/>
+        tools:text="Переведено сервисом «Яндекс.Переводчик»\nhttp://translate.yandex.ru/"/>
 
-    <!--android:spinnerMode="dialog"-->
     <Spinner
         android:id="@+id/from_language_spinner"
         android:layout_width="0dp"
@@ -122,10 +157,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="24dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginRight="16dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
         android:background="@android:color/transparent"
-        android:src="@drawable/ic_history_24dp"
+        android:src="@drawable/ic_history_30dp"
         app:layout_constraintBottom_toTopOf="@+id/bookmarks_image_button"
         app:layout_constraintRight_toRightOf="parent"/>
 
@@ -134,10 +169,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="24dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginRight="16dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
         android:background="@android:color/transparent"
-        android:src="@drawable/ic_bookmark_24dp"
+        android:src="@drawable/ic_bookmark_30dp"
         app:layout_constraintBottom_toTopOf="@+id/to_language_spinner"
         app:layout_constraintRight_toRightOf="parent"/>
 

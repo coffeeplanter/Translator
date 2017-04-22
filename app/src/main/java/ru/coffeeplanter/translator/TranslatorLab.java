@@ -6,16 +6,17 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
-import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.UUID;
 
 import ru.coffeeplanter.translator.database.TranslationCardCursorWrapper;
 import ru.coffeeplanter.translator.database.TranslatorBaseHelper;
-import ru.coffeeplanter.translator.database.TranslatorDbSchema.*;
+import ru.coffeeplanter.translator.database.TranslatorDbSchema.LanguagesTable;
+import ru.coffeeplanter.translator.database.TranslatorDbSchema.TranslationCardsTable;
 
 /**
  * Класс-синглтон для взаимодействия с базой данных.
@@ -28,7 +29,8 @@ public class TranslatorLab {
     private final long MAX_HISTORY_LIMIT = 10;
     private final long MAX_BOOKMARKS_LIMIT = 5;
 
-    @SuppressLint("StaticFieldLeak") // Утечки быть не должно, т. к. использую getApplicationContext.
+    @SuppressLint("StaticFieldLeak")
+    // Утечки быть не должно, т. к. использую getApplicationContext.
     private static TranslatorLab sTranslatorLab;
 
     private Context mContext;
@@ -71,27 +73,21 @@ public class TranslatorLab {
     }
 
     public void addTranslationCard(TranslationCard translationCard) {
-
-
         ContentValues values = getContentValues(translationCard);
-        long numEntries = DatabaseUtils.queryNumEntries(mDataBase, TranslationCardsTable.NAME);
-        Log.d(TAG, "Rows num: " + numEntries);
+        long numEntries = DatabaseUtils.queryNumEntries(mDataBase, TranslationCardsTable.NAME, TranslationCardsTable.Cols.BOOKMARKED + " = ?", new String[]{"0"});
         if (numEntries < MAX_HISTORY_LIMIT) {
-//            mDataBase.insert(TranslationCardsTable.NAME, null, values);
-            mDataBase.replace(TranslationCardsTable.NAME, null, values);
-            Log.d(TAG, "numEntries < MAX_HISTORY_LIMIT");
+            mDataBase.insert(TranslationCardsTable.NAME, null, values);
         } else {
             Long numEntriesToDelete = numEntries - MAX_HISTORY_LIMIT + 1;
             mDataBase.beginTransaction();
             try {
                 for (int i = 0; i < numEntriesToDelete.intValue(); i++) {
-//                    int num = mDataBase.delete(TranslationCardsTable.NAME, TranslationCardsTable.Cols.REQUEST_DATE + " = ?",
-//                            new String[]{"(SELECT MIN(" + TranslationCardsTable.Cols.REQUEST_DATE + ") FROM " + TranslationCardsTable.NAME + ")"});
-//                    Log.d(TAG, "entries deleted: " + num);
                     mDataBase.execSQL("DELETE FROM " + TranslationCardsTable.NAME +
                             " WHERE " + TranslationCardsTable.Cols.REQUEST_DATE +
                             " = (SELECT MIN(" + TranslationCardsTable.Cols.REQUEST_DATE +
-                            ") FROM " + TranslationCardsTable.NAME + ");"
+                            ") FROM " + TranslationCardsTable.NAME +
+                            " WHERE " + TranslationCardsTable.Cols.BOOKMARKED +
+                            " = 0" + ");"
                     );
                 }
                 mDataBase.insert(TranslationCardsTable.NAME, null, values);
@@ -99,28 +95,49 @@ public class TranslatorLab {
             } finally {
                 mDataBase.endTransaction();
             }
-            Log.d(TAG, "numEntries > MAX_HISTORY_LIMIT");
         }
-
     }
 
-    public void updateTranslationCard(TranslationCard translationCard) {
+    public boolean updateTranslationCard(TranslationCard translationCard) {
         String uuidString = translationCard.getId().toString();
         ContentValues values = getContentValues(translationCard);
-        mDataBase.update(TranslationCardsTable.NAME,
-                values,
+        long numEntries = DatabaseUtils.queryNumEntries(mDataBase, TranslationCardsTable.NAME, TranslationCardsTable.Cols.BOOKMARKED + " = ?", new String[]{"1"});
+        if (((numEntries < MAX_BOOKMARKS_LIMIT) && (translationCard.isBookmarked())) || (!translationCard.isBookmarked())) {
+            mDataBase.update(TranslationCardsTable.NAME,
+                    values,
+                    TranslationCardsTable.Cols.UUID + " = ?",
+                    new String[]{uuidString}
+            );
+            return true; // В случае успешного обновления
+        } else {
+            return false; // В случае достижения лимита на количество строк в БД
+        }
+    }
+
+    public void deleteTranslationCard(TranslationCard translationCard) {
+        String uuidString = translationCard.getId().toString();
+        mDataBase.delete(TranslationCardsTable.NAME,
                 TranslationCardsTable.Cols.UUID + " = ?",
                 new String[]{uuidString}
         );
+
     }
 
+    public void deleteTranslationCards(boolean bookmarks) {
+        if (bookmarks) {
+            Long numEntries = DatabaseUtils.queryNumEntries(mDataBase, TranslationCardsTable.NAME, TranslationCardsTable.Cols.BOOKMARKED + " = ?", new String[]{"1"});
+            mDataBase.delete(TranslationCardsTable.NAME, TranslationCardsTable.Cols.BOOKMARKED + " = ?", new String[]{"1"});
+        } else {
+            Long numEntries = DatabaseUtils.queryNumEntries(mDataBase, TranslationCardsTable.NAME, TranslationCardsTable.Cols.BOOKMARKED + " = ?", new String[]{"0"});
+            mDataBase.delete(TranslationCardsTable.NAME, TranslationCardsTable.Cols.BOOKMARKED + " = ?", new String[]{"0"});
+        }
+    }
 
-    public TranslationCard getTranslationCardByTextAndLangs(String textToTranslate, String fromLang, String toLang) {
-        TranslationCardCursorWrapper cursor = queryCrimes(
-                TranslationCardsTable.Cols.TEXT_TO_TRANSLATE + " = ? AND " +
-                        TranslationCardsTable.Cols.FROM_LANGUAGE + " = ? AND " +
-                        TranslationCardsTable.Cols.TO_LANGUAGE + " = ?",
-                new String[]{textToTranslate, fromLang, toLang}
+    public TranslationCard getTranslationCardById(UUID id) {
+        TranslationCardCursorWrapper cursor = queryTranslationCards(
+                TranslationCardsTable.Cols.UUID + " = ?",
+                new String[]{id.toString()},
+                null
         );
         try {
             if (cursor.getCount() == 0) {
@@ -131,12 +148,47 @@ public class TranslatorLab {
         } finally {
             cursor.close();
         }
-
     }
 
-    public List<TranslationCard> getTranslationCards() {
+
+    public TranslationCard getTranslationCardByTextAndLangs(String textToTranslate, String fromLang, String toLang) {
+        TranslationCardCursorWrapper cursor = queryTranslationCards(
+                TranslationCardsTable.Cols.TEXT_TO_TRANSLATE + " = ? AND " +
+                        TranslationCardsTable.Cols.FROM_LANGUAGE + " = ? AND " +
+                        TranslationCardsTable.Cols.TO_LANGUAGE + " = ?",
+                new String[]{textToTranslate, fromLang, toLang},
+                null
+        );
+        try {
+            if (cursor.getCount() == 0) {
+                return null;
+            }
+            cursor.moveToFirst();
+            return cursor.getTranslationCard();
+        } finally {
+            cursor.close();
+        }
+    }
+
+    public List<TranslationCard> getAllTranslationCards() {
         List<TranslationCard> cards = new ArrayList<>();
-        TranslationCardCursorWrapper cursor = queryCrimes(null, null);
+        TranslationCardCursorWrapper cursor = queryTranslationCards(null, null, TranslationCardsTable.Cols.REQUEST_DATE + " ASC");
+        cursor.moveToFirst();
+        while (!cursor.isAfterLast()) {
+            cards.add(0, cursor.getTranslationCard());
+            cursor.moveToNext();
+        }
+        cursor.close();
+        return cards;
+    }
+
+    public List<TranslationCard> getBookmarkedTranslationCards() {
+        List<TranslationCard> cards = new ArrayList<>();
+        TranslationCardCursorWrapper cursor = queryTranslationCards(
+                TranslationCardsTable.Cols.BOOKMARKED + " = ?",
+                new String[]{"1"},
+                TranslationCardsTable.Cols.REQUEST_DATE + " ASC"
+        );
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
             cards.add(0, cursor.getTranslationCard());
@@ -158,7 +210,7 @@ public class TranslatorLab {
         return values;
     }
 
-    private TranslationCardCursorWrapper queryCrimes(String whereClause, String[] whereArgs) {
+    private TranslationCardCursorWrapper queryTranslationCards(String whereClause, String[] whereArgs, String orderBy) {
         Cursor cursor = mDataBase.query(
                 TranslationCardsTable.NAME,
                 null, // Columns - null выбирает все столбцы
@@ -166,7 +218,7 @@ public class TranslatorLab {
                 whereArgs,
                 null, // groupBy
                 null, // having
-                null // orderBy
+                orderBy // orderBy
         );
         return new TranslationCardCursorWrapper(cursor);
     }

@@ -4,7 +4,8 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import ru.coffeeplanter.translator.database.TranslatorDbSchema.*;
+import ru.coffeeplanter.translator.database.TranslatorDbSchema.LanguagesTable;
+import ru.coffeeplanter.translator.database.TranslatorDbSchema.TranslationCardsTable;
 
 /**
  * Класс для инициализации базы данных.
@@ -14,6 +15,8 @@ public class TranslatorBaseHelper extends SQLiteOpenHelper {
 
     public static final int VERSION = 1;
     public static final String DATABASE_NAME = "translatorBase.db";
+
+    private final String TAG = "TranslatorBaseHelper";
 
     private String[][] initial_languages;
 
@@ -41,13 +44,6 @@ public class TranslatorBaseHelper extends SQLiteOpenHelper {
                 LanguagesTable.Cols.DISPLAY_LANGUAGE_FOR_CURRENT_LOCALE + " text" +
                 ");"
         );
-
-//        db.execSQL("CREATE TABLE IF NOT EXIST " + LanguagesTable.NAME + "(" +
-//                "_id integer PRIMARY KEY AUTOINCREMENT, " +
-//                LanguagesTable.Cols.LANGUAGE_CODE + " text NOT NULL UNIQUE, " +
-//                LanguagesTable.Cols.DISPLAY_LANGUAGE_FOR_CURRENT_LOCALE + " text NOT NULL UNIQUE" +
-//                ")"
-//        );
 
         // Её наполнение начальными данными (которые потом будут перезаписаны данными с сервера).
         int i = 0;
