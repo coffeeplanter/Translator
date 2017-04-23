@@ -11,4 +11,10 @@
     <string name="bookmarks_are_deleted_separately_message">You can delete bookmarks individually by swipe or all of them from relevant section</string>
     <string name="empty_list_label">The list is empty</string>
     <string name="translation_error_label">Couldn\'t connect to server…</string>
+    <string name="server_error_401">Wrong API key</string>
+    <string name="server_error_402">API key is blocked</string>
+    <string name="server_error_404">Daily limit for size of translated text is exceeded</string>
+    <string name="server_error_413">Maximal text size is exceeded</string>
+    <string name="server_error_422">The text cannot be translated</string>
+    <string name="server_error_501">Translation direction is not supported</string>
 </resources>

@@ -26,8 +26,8 @@ public class TranslatorLab {
 
     private final String TAG = "TranslatorLab";
 
-    private final long MAX_HISTORY_LIMIT = 10;
-    private final long MAX_BOOKMARKS_LIMIT = 5;
+    private final long MAX_HISTORY_LIMIT = 100; // Максимальное количество хранимых карточек в истории переводов
+    private final long MAX_BOOKMARKS_LIMIT = 50; // Максимальное количество избранных карточек
 
     @SuppressLint("StaticFieldLeak")
     // Утечки быть не должно, т. к. использую getApplicationContext.
@@ -48,6 +48,7 @@ public class TranslatorLab {
         mDataBase = new TranslatorBaseHelper(context).getWritableDatabase();
     }
 
+    // Сохранение нового списка языков в БД
     public void updateLanguagesList(Map<String, String> langs) {
         mDataBase.delete(LanguagesTable.NAME, "1", null);
         for (Map.Entry<String, String> lang : langs.entrySet()) {
@@ -58,6 +59,7 @@ public class TranslatorLab {
         }
     }
 
+    // Чтение списка языков из БД
     public Map<String, String> getLanguages() {
         Map<String, String> langs = new TreeMap<>();
         Cursor cursor = mDataBase.query(LanguagesTable.NAME, null, null, null, null, null, null);
@@ -72,6 +74,7 @@ public class TranslatorLab {
         return langs;
     }
 
+    // Добавление новой карточки перевода в БД.
     public void addTranslationCard(TranslationCard translationCard) {
         ContentValues values = getContentValues(translationCard);
         long numEntries = DatabaseUtils.queryNumEntries(mDataBase, TranslationCardsTable.NAME, TranslationCardsTable.Cols.BOOKMARKED + " = ?", new String[]{"0"});
@@ -98,6 +101,7 @@ public class TranslatorLab {
         }
     }
 
+    // Обновление существующей карточки перевода в БД.
     public boolean updateTranslationCard(TranslationCard translationCard) {
         String uuidString = translationCard.getId().toString();
         ContentValues values = getContentValues(translationCard);
@@ -114,6 +118,7 @@ public class TranslatorLab {
         }
     }
 
+    // Удаление карточки перевода из БД.
     public void deleteTranslationCard(TranslationCard translationCard) {
         String uuidString = translationCard.getId().toString();
         mDataBase.delete(TranslationCardsTable.NAME,
@@ -123,16 +128,18 @@ public class TranslatorLab {
 
     }
 
+    // Удаление всех карточек перевода из БД, в зависимости от того, избранные они или нет.
     public void deleteTranslationCards(boolean bookmarks) {
-        if (bookmarks) {
+        if (bookmarks) { // Удаляем все избранные карточки.
             Long numEntries = DatabaseUtils.queryNumEntries(mDataBase, TranslationCardsTable.NAME, TranslationCardsTable.Cols.BOOKMARKED + " = ?", new String[]{"1"});
             mDataBase.delete(TranslationCardsTable.NAME, TranslationCardsTable.Cols.BOOKMARKED + " = ?", new String[]{"1"});
-        } else {
+        } else { // Удаляем все карточки без отметки "Избранная".
             Long numEntries = DatabaseUtils.queryNumEntries(mDataBase, TranslationCardsTable.NAME, TranslationCardsTable.Cols.BOOKMARKED + " = ?", new String[]{"0"});
             mDataBase.delete(TranslationCardsTable.NAME, TranslationCardsTable.Cols.BOOKMARKED + " = ?", new String[]{"0"});
         }
     }
 
+    // Чтение карточки перевода из БД по её id.
     public TranslationCard getTranslationCardById(UUID id) {
         TranslationCardCursorWrapper cursor = queryTranslationCards(
                 TranslationCardsTable.Cols.UUID + " = ?",
@@ -150,7 +157,7 @@ public class TranslatorLab {
         }
     }
 
-
+    // Поиск и чтение карточки перевода по переводимому тексту и направлению перевода.
     public TranslationCard getTranslationCardByTextAndLangs(String textToTranslate, String fromLang, String toLang) {
         TranslationCardCursorWrapper cursor = queryTranslationCards(
                 TranslationCardsTable.Cols.TEXT_TO_TRANSLATE + " = ? AND " +
@@ -170,6 +177,7 @@ public class TranslatorLab {
         }
     }
 
+    // Чтение всего списка карточек перевода из БД.
     public List<TranslationCard> getAllTranslationCards() {
         List<TranslationCard> cards = new ArrayList<>();
         TranslationCardCursorWrapper cursor = queryTranslationCards(null, null, TranslationCardsTable.Cols.REQUEST_DATE + " ASC");
@@ -182,6 +190,7 @@ public class TranslatorLab {
         return cards;
     }
 
+    // Чтение списка избранных карточек из БД.
     public List<TranslationCard> getBookmarkedTranslationCards() {
         List<TranslationCard> cards = new ArrayList<>();
         TranslationCardCursorWrapper cursor = queryTranslationCards(
@@ -198,6 +207,7 @@ public class TranslatorLab {
         return cards;
     }
 
+    // Подготовка объекта TranslationCard для записи в БД.
     private ContentValues getContentValues(TranslationCard translationCard) {
         ContentValues values = new ContentValues();
         values.put(TranslationCardsTable.Cols.UUID, translationCard.getId().toString());
@@ -210,6 +220,7 @@ public class TranslatorLab {
         return values;
     }
 
+    // Запрос на чтение из БД с обёрткой дял удобного преобразования в объект TranslationCard.
     private TranslationCardCursorWrapper queryTranslationCards(String whereClause, String[] whereArgs, String orderBy) {
         Cursor cursor = mDataBase.query(
                 TranslationCardsTable.NAME,

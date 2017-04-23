@@ -11,4 +11,10 @@
     <string name="bookmarks_are_being_deleted_separately_message">Избранные переводы удаляются свайпом или все вместе из соответствующего раздела</string>
     <string name="empty_list_label">Список пуст</string>
     <string name="translation_error_label">Не удалось соединиться с сервером…</string>
+    <string name="server_error_401">Неправильный API-ключ</string>
+    <string name="server_error_402">API-ключ заблокирован</string>
+    <string name="server_error_404">Превышено суточное ограничение на объем переведенного текста</string>
+    <string name="server_error_413">Превышен максимально допустимый размер текста</string>
+    <string name="server_error_422">Текст не может быть переведен</string>
+    <string name="server_error_501">Заданное направление перевода не поддерживается</string>
 </resources>

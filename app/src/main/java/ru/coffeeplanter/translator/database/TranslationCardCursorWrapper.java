@@ -21,6 +21,7 @@ public class TranslationCardCursorWrapper extends CursorWrapper {
 
     public TranslationCard getTranslationCard() {
 
+        // Читаем данные из Cursor.
         String uuidString = getString(getColumnIndex(TranslationCardsTable.Cols.UUID));
         String textToTranslate = getString(getColumnIndex(TranslationCardsTable.Cols.TEXT_TO_TRANSLATE));
         String translatedText = getString(getColumnIndex(TranslationCardsTable.Cols.TRANSLATED_TEXT));
@@ -29,6 +30,7 @@ public class TranslationCardCursorWrapper extends CursorWrapper {
         int isBookmarked = getInt(getColumnIndex(TranslationCardsTable.Cols.BOOKMARKED));
         long requestDate = getLong(getColumnIndex(TranslationCardsTable.Cols.REQUEST_DATE));
 
+        // Записываем их в объект TranslationCard.
         TranslationCard translationCard = new TranslationCard(UUID.fromString(uuidString));
         translationCard.setTextToTranslate(textToTranslate);
         translationCard.setTranslatedText(translatedText);

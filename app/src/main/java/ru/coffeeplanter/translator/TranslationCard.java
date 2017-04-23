@@ -71,6 +71,7 @@ public class TranslationCard {
         mToLanguage = toLanguage;
     }
 
+    // Возвращает направление перевода в удобном для вывода в UI формате
     public String getTranslationDirection() {
         String fromBufffer = getFromLanguage();
         if (fromBufffer != null) {

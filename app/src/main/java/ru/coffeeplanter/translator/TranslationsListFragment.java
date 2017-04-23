@@ -37,21 +37,24 @@ import ru.coffeeplanter.translator.swipehelper.ItemTouchHelperViewHolder;
 
 public class TranslationsListFragment extends Fragment {
 
-    private static final String ARG_IS_BOOKMARKS = "crime_id";
+    // Ключ для аргумента фрагмента, определяющего что загружается во фрагмент — исторяи или избранное.
+    private static final String ARG_IS_BOOKMARKS = "is_bookmarks";
 
     private final String TAG = "TranslationsListFrag";
 
     private boolean isBookmarks; // Если false, загружаем историю, если true — избранные карточки.
 
-    private List<TranslationCard> mTranslationCards;
+    private List<TranslationCard> mTranslationCards; // Список данных для RecyclerView.
+
+    // Компоненты UI.
     private TranslationCardAdapter mTranslationCardAdapter;
     private RecyclerView mTranslationCardsRecyclerView;
     private TextView mEmptyListTextView;
     Toolbar mToolbar;
 
-    private ItemTouchHelper mItemTouchHelper;
+    private ItemTouchHelper mItemTouchHelper; // Объект для работы со свайпами.
 
-
+    // Метод для создания экземпляра фрагмента с передачей в него параметра типа списка.
     public static TranslationsListFragment newInstance(boolean isBookmarks) {
         Bundle args = new Bundle();
         args.putBoolean(ARG_IS_BOOKMARKS, isBookmarks);
@@ -63,8 +66,8 @@ public class TranslationsListFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        isBookmarks = getArguments().getBoolean(ARG_IS_BOOKMARKS, false);
-        setHasOptionsMenu(true);
+        isBookmarks = getArguments().getBoolean(ARG_IS_BOOKMARKS, false); // Устанавливаем тип списка.
+        setHasOptionsMenu(true); // Устанавливаем фрагменту возможность иметь меню (для кнопки "Очистить список").
     }
 
     @Nullable
@@ -73,24 +76,29 @@ public class TranslationsListFragment extends Fragment {
 
         View view = inflater.inflate(R.layout.fragment_translations_list, container, false);
 
+        // Инициализация RecyclerView.
         mTranslationCardsRecyclerView = (RecyclerView) view.findViewById(R.id.translation_cards_recycler_view);
         mTranslationCardsRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
+        // Инициализация списка данных.
         if (mTranslationCards == null) {
             mTranslationCards = new ArrayList<>();
         }
 
+        // Загружаем данные в зависимости от типа списка.
         if (isBookmarks) {
             mTranslationCards = TranslatorLab.get(getActivity()).getBookmarkedTranslationCards();
         } else {
             mTranslationCards = TranslatorLab.get(getActivity()).getAllTranslationCards();
         }
 
+        // Установка адаптера для RecyclerView.
         if (mTranslationCardAdapter == null) {
             mTranslationCardAdapter = new TranslationCardAdapter(mTranslationCards);
             mTranslationCardsRecyclerView.setAdapter(mTranslationCardAdapter);
         }
 
+        // Установка панели инструментов.
         mToolbar = (Toolbar) view.findViewById(R.id.fragment_list_toolbar);
         ((AppCompatActivity) getActivity()).setSupportActionBar(mToolbar);
         if (isBookmarks) {
@@ -105,12 +113,16 @@ public class TranslationsListFragment extends Fragment {
             Log.e(TAG, "Error while setting Back button", npe);
         }
 
+        // Инициализация вьюхи для пустого списка.
         mEmptyListTextView = (TextView) view.findViewById(R.id.empty_list_text_view);
+
+        // Установка видимости вьюх в зависимости от того, пуст или нет список данных.
         switchViewsOnRecyclerViewEmpty();
 
         return view;
     }
 
+    // Метод для установки видимости вьюх в зависимости от того, пуст или нет список данных.
     private void switchViewsOnRecyclerViewEmpty() {
         if (mTranslationCardAdapter.getItemCount() > 0) {
             mTranslationCardsRecyclerView.setVisibility(View.VISIBLE);
@@ -124,6 +136,7 @@ public class TranslationsListFragment extends Fragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        // Инициализиция объектов для свайпов.
         ItemTouchHelper.Callback callback = new CardTouchHelperCallback(mTranslationCardAdapter);
         mItemTouchHelper = new ItemTouchHelper(callback);
         mItemTouchHelper.attachToRecyclerView(mTranslationCardsRecyclerView);
@@ -132,6 +145,7 @@ public class TranslationsListFragment extends Fragment {
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.fragment_translations_list_menu, menu);
+        // Меняем название пункта меню в зависимости от типа списка.
         if (isBookmarks) {
             menu.findItem(R.id.menu_item_clear_all).setTitle(R.string.clear_all_bookmarks_menu_item);
         }
@@ -140,6 +154,8 @@ public class TranslationsListFragment extends Fragment {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+            // Очистка списков в БД и объекте ArrayList, уведомление адаптера,
+            // установка видимости вьюх и возврат к фрагменту интерфейса перевода.
             case R.id.menu_item_clear_all:
                 if (isBookmarks) {
                     TranslatorLab.get(getActivity()).deleteTranslationCards(true);
@@ -151,7 +167,7 @@ public class TranslationsListFragment extends Fragment {
                         fm.popBackStack();
                         return true;
                     }
-                } else {
+                } else { // Из списка истории избранные карточки все вместе не удаляются, но их можно удалить с помощью свайпа.
                     TranslatorLab.get(getActivity()).deleteTranslationCards(false);
                     mTranslationCards.clear();
                     mTranslationCards.addAll(TranslatorLab.get(getActivity()).getAllTranslationCards());
@@ -175,6 +191,7 @@ public class TranslationsListFragment extends Fragment {
         return super.onOptionsItemSelected(item);
     }
 
+    // Анимация при смене фрагментов.
     @Override
     public Animation onCreateAnimation(int transit, boolean enter, int nextAnim) {
         if (nextAnim != 0) {
@@ -208,7 +225,7 @@ public class TranslationsListFragment extends Fragment {
         private Drawable mBackgroundBuffer;
 
         public TranslationCardHolder(LayoutInflater inflater, ViewGroup parent) {
-            super(inflater.inflate(R.layout.list_item, parent, false));
+            super(inflater.inflate(R.layout.recylcerview_list_item, parent, false));
             mTextToTranslateTextView = (TextView) itemView.findViewById(R.id.text_to_translate_list_item_text_view);
             mTranslatedTextTextView = (TextView) itemView.findViewById(R.id.translated_text_list_item_text_view);
             mTranslationDirectionTextView = (TextView) itemView.findViewById(R.id.translate_direction_list_item_text_view);
@@ -227,6 +244,7 @@ public class TranslationsListFragment extends Fragment {
             }
         }
 
+        // Начало свайпа.
         @Override
         public void onItemSelected() {
             mBackgroundBuffer = itemView.getBackground();
@@ -234,6 +252,7 @@ public class TranslationsListFragment extends Fragment {
 //            itemView.setBackgroundColor(Color.TRANSPARENT);
         }
 
+        // Завершение свайпа.
         @Override
         public void onItemClear() {
             itemView.setBackground(mBackgroundBuffer);
@@ -261,6 +280,7 @@ public class TranslationsListFragment extends Fragment {
             final TranslationCard translationCard = mTranslationCards.get(position);
             holder.bindTranslationCard(translationCard);
 
+            // Обработчик для занесения карточки в избранные или удаления из избранных.
             View.OnClickListener listener = new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -300,6 +320,7 @@ public class TranslationsListFragment extends Fragment {
             return super.getItemViewType(position);
         }
 
+        // Действия при удалении карточки с помощью свайпа.
         @Override
         public void onItemDismiss(int position) {
             TranslatorLab.get(getActivity()).deleteTranslationCard(mTranslationCards.get(position));

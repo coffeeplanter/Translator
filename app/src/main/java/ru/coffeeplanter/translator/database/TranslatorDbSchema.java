@@ -6,6 +6,7 @@ package ru.coffeeplanter.translator.database;
 
 public class TranslatorDbSchema {
 
+    // Таблица поддерживаемых языков.
     public static final class LanguagesTable {
 
         public static final String NAME = "languages";
@@ -17,6 +18,7 @@ public class TranslatorDbSchema {
 
     }
 
+    // Таблица карточек перевода.
     public static final class TranslationCardsTable {
 
         public static final String NAME = "translation_cards";

@@ -22,6 +22,7 @@ public class TranslatorBaseHelper extends SQLiteOpenHelper {
 
     public TranslatorBaseHelper(Context context) {
         super(context, DATABASE_NAME, null, VERSION);
+        // Начальный список поддерживаемых языков, будет использован до загрузки нового списка с сервера.
         initial_languages = new String[][]{
                 new String[]{"'ar'", "'Arabic'"},
                 new String[]{"'zh'", "'Chinese'"},
