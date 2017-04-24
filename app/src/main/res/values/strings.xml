@@ -4,6 +4,7 @@
     <string name="bookmarks_header">Bookmarks</string>
     <string name="clear_all_history_menu_item">Delete history</string>
     <string name="clear_all_bookmarks_menu_item">Clear all</string>
+    <string name="application_initialization_label">Initializing…\nPlease wait.</string>
     <string name="enter_text_hint">Enter a word or a text to translate…</string>
     <string name="translated_text_label">Translated text will be here</string>
     <string name="app_background_description">Just a background image</string>

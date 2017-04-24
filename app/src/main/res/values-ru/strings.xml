@@ -5,6 +5,7 @@
     <string name="bookmarks_header">Избранные переводы</string>
     <string name="clear_all_history_menu_item">Удалить историю</string>
     <string name="clear_all_bookmarks_menu_item">Очистить список</string>
+    <string name="application_initialization_label">Инициализация…\nПожалуйста, подождите.</string>
     <string name="enter_text_hint">Введите слово или текст…</string>
     <string name="app_background_description">Фоновое изображение</string>
     <string name="bookmarks_limit_achieved_message">Достигнут лимит закладок!</string>

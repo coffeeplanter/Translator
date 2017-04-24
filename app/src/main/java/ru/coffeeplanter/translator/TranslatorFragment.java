@@ -44,7 +44,7 @@ import retrofit2.Response;
 import ru.coffeeplanter.translator.utils.LocaleUtils;
 
 /**
- * Класс фрагмента интерфейса перевода, является основным экраном приложения.
+ * Класс фрагмента пользовательского интерфейса перевода, используется как основной экран приложения.
  */
 
 public class TranslatorFragment extends Fragment {
@@ -55,19 +55,21 @@ public class TranslatorFragment extends Fragment {
     private final String APP_PREFERENCES = "translator_settings";
     private final String APP_PREFERENCES_FROM_LANGUAGE_SPINNER = "from_language";
     private final String APP_PREFERENCES_TO_LANGUAGE_SPINNER = "to_language";
-    SharedPreferences mSettings;
+    private SharedPreferences mSettings;
 
-    Map<String, String> mServerErrorsMap; // Список возможных ошибок перевода сервера.
+    private boolean mFirstLoad = true; // Флаг для определения первой загрузки фрагмента.
 
-    Map<String, String> mLanguagesMap; // Список поддерживаемых языков, ключ — название языка для текущей локали, значение — код языка.
-    TranslationCard translationCard; // Текущая карточка перевода.
+    private Map<String, String> mServerErrorsMap; // Список возможных ошибок перевода сервера.
+
+    private Map<String, String> mLanguagesMap; // Список поддерживаемых языков, ключ — название языка для текущей локали, значение — код языка.
+    private TranslationCard translationCard; // Текущая карточка перевода.
 
     // Компоненты UI.
-    EditText mEditTextTextToTranslate;
-    TextView mTextViewTranslatedText;
-    Spinner mSpinnerFromLanguage, mSpinnerToLanguage;
-    ImageButton mImageButtonClearTextToTranslate, mImageButtonAddToBookmarks;
-    ImageButton mImageButtonRevertLanguages, mImageButtonHistory, mImageButtonBookmarks;
+    private EditText mEditTextTextToTranslate;
+    private TextView mTextViewTranslatedText;
+    private Spinner mSpinnerFromLanguage, mSpinnerToLanguage;
+    private ImageButton mImageButtonClearTextToTranslate, mImageButtonAddToBookmarks;
+    private ImageButton mImageButtonRevertLanguages, mImageButtonHistory, mImageButtonBookmarks;
 
     @Override
     public void onAttach(Context context) {
@@ -93,10 +95,15 @@ public class TranslatorFragment extends Fragment {
                     mLanguagesMap.put(entry.getValue().getAsString(), entry.getKey());
                 }
                 TranslatorLab.get(getActivity()).updateLanguagesList(mLanguagesMap);
+                mEditTextTextToTranslate.setHint(R.string.enter_text_hint);
+                mFirstLoad = false;
             }
 
             @Override
             public void onFailure(Call<JsonObject> call, Throwable t) {
+                mEditTextTextToTranslate.setHint(R.string.enter_text_hint);
+                mTextViewTranslatedText.setHint(R.string.translation_error_label);
+                mFirstLoad = false;
                 Log.e(TAG, "Error while getting languages list from server", t);
             }
         });
@@ -124,6 +131,8 @@ public class TranslatorFragment extends Fragment {
         mSpinnerToLanguage = (Spinner) view.findViewById(R.id.to_language_spinner);
 
         mEditTextTextToTranslate = (EditText) view.findViewById(R.id.text_to_translate_edit_text);
+        // Вывод предложения пользователю подождать
+//        mEditTextTextToTranslate.setHint(R.string.application_initialization_label);
 
         mTextViewTranslatedText = (TextView) view.findViewById(R.id.translated_text_text_view);
 
@@ -146,7 +155,7 @@ public class TranslatorFragment extends Fragment {
                 if ((translationCard != null) && (!fromBuffer.equals(""))) {
                     if (translationCard.isBookmarked()) {
                         translationCard.setBookmarked(false);
-                        mImageButtonAddToBookmarks.setImageResource(R.drawable.ic_bookmark_24dp);
+                        mImageButtonAddToBookmarks.setImageResource(R.drawable.ic_bookmark_near_input_field_24dp);
                         TranslatorLab.get(getActivity()).updateTranslationCard(translationCard);
                     } else {
                         translationCard.setBookmarked(true);
@@ -207,6 +216,11 @@ public class TranslatorFragment extends Fragment {
         // Тэг устанавливается для предотвращения загрузки перевода при возврате из списков к фрагменту перевода.
         mEditTextTextToTranslate.setTag(false);
 
+        // Если фрагмент загружается не при запуске приложения, устанавливаем приглашение к вводу.
+        if (!mFirstLoad) {
+            mEditTextTextToTranslate.setHint(R.string.enter_text_hint);
+        }
+
         // Установка обработчика вводу текста.
         mEditTextTextToTranslate.addTextChangedListener(new TextWatcher() {
             @Override
@@ -230,11 +244,6 @@ public class TranslatorFragment extends Fragment {
                 }
             }
         });
-
-        // Если возвращаемся к фрагменту из списка и у нас нет соединения, то устанавливаем соответствующий цвет текста.
-        if (mTextViewTranslatedText.getText().toString().equals(getString(R.string.translation_error_label))) {
-            mTextViewTranslatedText.setTextColor(0x4dffffff);
-        }
 
         // Инициализация объекта SharedPreferences.
         mSettings = getActivity().getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE);
@@ -330,12 +339,12 @@ public class TranslatorFragment extends Fragment {
         translationCard = TranslatorLab.get(getActivity()).getTranslationCardByTextAndLangs(s.toString(), fromLang, toLang);
         if (translationCard != null) { // Если карточка существует, загружаем её в UI.
             translationCard.setRequestDate(new Date());
-            mTextViewTranslatedText.setTextColor(0xffffffff);
+            mTextViewTranslatedText.setHint("");
             mTextViewTranslatedText.setText(translationCard.getTranslatedText());
             if (translationCard.isBookmarked()) {
                 mImageButtonAddToBookmarks.setImageResource(R.drawable.ic_bookmark_teal_24dp);
             } else {
-                mImageButtonAddToBookmarks.setImageResource(R.drawable.ic_bookmark_24dp);
+                mImageButtonAddToBookmarks.setImageResource(R.drawable.ic_bookmark_near_input_field_24dp);
             }
             TranslatorLab.get(getActivity()).updateTranslationCard(translationCard);
         } else if ((!(Boolean) mEditTextTextToTranslate.getTag()) &&
@@ -370,14 +379,12 @@ public class TranslatorFragment extends Fragment {
                         // Парсим ответ с переведённым текстом и вносим изменнеия в UI и БД.
                         String buffer = response.body().getAsJsonArray("text").get(0).toString();
                         buffer = buffer.substring(1, buffer.length() - 1);
-                        mTextViewTranslatedText.setTextColor(0xffffffff);
-                        mTextViewTranslatedText.setText("");
+                        mTextViewTranslatedText.setHint("");
                         if (!buffer.equals("")) {
                             buffer = buffer.replace("\\n", System.getProperty("line.separator"));
                             mTextViewTranslatedText.setText(buffer);
                         }
-                        mImageButtonAddToBookmarks.setImageResource(R.drawable.ic_bookmark_24dp);
-                        Log.d(TAG, response.body().getAsJsonArray("text").toString());
+                        mImageButtonAddToBookmarks.setImageResource(R.drawable.ic_bookmark_near_input_field_24dp);
                         Linkify.addLinks(mTextViewTranslatedText, Linkify.ALL);
                         mTextViewTranslatedText.setMovementMethod(LinkMovementMethod.getInstance());
                         translationCard = new TranslationCard();
@@ -393,8 +400,7 @@ public class TranslatorFragment extends Fragment {
 
                 @Override
                 public void onFailure(Call<JsonObject> call, Throwable t) {
-                    mTextViewTranslatedText.setText(R.string.translation_error_label);
-                    mTextViewTranslatedText.setTextColor(0x4dffffff);
+                    mTextViewTranslatedText.setHint(R.string.translation_error_label);
                     Log.e(TAG, "Error while getting translation from server", t);
                 }
             });

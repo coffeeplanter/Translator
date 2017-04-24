@@ -2,5 +2,5 @@
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:drawable="@drawable/ic_cancel_teal_24dp"
           android:state_pressed="true"/>
-    <item android:drawable="@drawable/ic_cancel_white_24dp"/>
+    <item android:drawable="@drawable/ic_cancel_grey_24dp"/>
 </selector>

@@ -9,18 +9,6 @@
     tools:layout_editor_absoluteX="0dp"
     tools:layout_editor_absoluteY="81dp">
 
-    <!--<android.support.v7.widget.Toolbar-->
-    <!--android:id="@+id/toolbar"-->
-    <!--android:layout_width="0dp"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:background="?attr/colorPrimary"-->
-    <!--android:minHeight="?attr/actionBarSize"-->
-    <!--android:theme="?attr/actionBarTheme"-->
-    <!--app:layout_constraintHorizontal_bias="0.0"-->
-    <!--app:layout_constraintLeft_toLeftOf="parent"-->
-    <!--app:layout_constraintRight_toRightOf="parent"-->
-    <!--app:layout_constraintTop_toTopOf="parent"/>-->
-
     <ImageView
         android:id="@+id/background_image_view"
         android:layout_width="0dp"
@@ -43,7 +31,7 @@
         android:background="@android:color/transparent"
         android:backgroundTint="@android:color/transparent"
         android:gravity="top|center_horizontal"
-        android:hint="@string/enter_text_hint"
+        android:hint="@string/application_initialization_label"
         android:inputType="textMultiLine"
         android:lines="6"
         android:maxLines="6"
@@ -87,7 +75,7 @@
         android:layout_marginRight="8dp"
         android:layout_marginTop="24dp"
         android:background="@android:color/transparent"
-        android:src="@drawable/ic_bookmark_24dp"
+        android:src="@drawable/ic_bookmark_near_input_field_24dp"
         android:visibility="gone"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/clear_text_to_translate_image_button"/>
