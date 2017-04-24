@@ -9,7 +9,7 @@
     <string name="translated_text_label">Translated text will be here</string>
     <string name="app_background_description">Just a background image</string>
     <string name="bookmarks_limit_achieved_message">Bookmarks limit achieved!</string>
-    <string name="bookmarks_are_deleted_separately_message">You can delete bookmarks individually by swipe or all of them from relevant section</string>
+    <string name="bookmarks_are_being_deleted_separately_message">You can delete bookmarks individually by swipe or all of them from relevant section</string>
     <string name="empty_list_label">The list is empty</string>
     <string name="translation_error_label">Couldn\'t connect to server…</string>
     <string name="server_error_401">Wrong API key</string>
